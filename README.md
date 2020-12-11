@@ -9,8 +9,4 @@ NB! The project is in its infancy and we hope it stays this way, meaning Apps Sc
 At the moment the app is not released to general public, and you have to contact me personally to add you to the app.
 I'm not planning to release (verify) the webapp as I really hope it is just an emergency tool and that soon there won't be the need of it.
 
-# known issues
-Not everything gets compiled, like Object.assign or Object.values. I suspect many more are in the line.
-
-To solve this I need a babel standalone version that includes plugins - if you can help, you are welcome.
 
