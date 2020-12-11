@@ -7200,4 +7200,38 @@ _dereq_(7);
 _dereq_(304);
 
 _dereq_(305);
-},{"1":1,"10":10,"11":11,"12":12,"2":2,"3":3,"304":304,"305":305,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9}]},{},[306]);</script>
+},{"1":1,"10":10,"11":11,"12":12,"2":2,"3":3,"304":304,"305":305,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9}]},{},[306]);
+/**
+ * Array.flat() polyfill
+ * Adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat#reduce_concat_isArray_recursivity
+ */
+if (!Array.prototype.flat) {
+	Array.prototype.flat = function(depth) {
+
+		'use strict';
+
+		// If no depth is specified, default to 1
+		if (depth === undefined) {
+			depth = 1;
+		}
+
+		// Recursively reduce sub-arrays to the specified depth
+		var flatten = function (arr, depth) {
+
+			// If depth is 0, return the array as-is
+			if (depth < 1) {
+				return arr.slice();
+			}
+
+			// Otherwise, concatenate into the parent array
+			return arr.reduce(function (acc, val) {
+				return acc.concat(Array.isArray(val) ? flatten(val, depth - 1) : val);
+			}, []);
+
+		};
+
+		return flatten(this, depth);
+
+	};
+}
+</script>
