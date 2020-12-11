@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+</head>
+
+<body style="color:white">
+
+    <div is="main-content"></div>
+
+    <script>
+        const has_call_backend = {
+            call_backend(name_method, array_arguments = []) {
+
+                return new Promise((resolve, reject) => {
+
+                    google.script.run
+                        .withSuccessHandler((result) => {
+                            resolve(result)
+                        })
+                        .withFailureHandler((result) => {
+                            reject(result)
+                        })[name_method](...array_arguments);
+
+                });
+
+            }
+        }
+
+        class SelectScript extends HTMLDivElement {
+            static get tag() {
+                return 'select-script';
+            }
+            async connectedCallback() {
+                
+                this.innerHTML = 'loading scripts';
+
+                const array_objects_scripts = JSON.parse(await this.call_backend('get_array_objects_scripts'));
+
+                const html_options = array_objects_scripts
+                    .map(object_script => `<option value="${object_script.id}">${object_script.name}</option>`)
+                    .join('');
+
+                this.innerHTML = `
+                  <label for="${this.id}-select">${this.getAttribute('additional-text')}</label>
+                  <select id="${this.id}-select" disabled>${html_options}</select>
+                  <a href="https://script.google.com/d/${array_objects_scripts[0].id}/edit" target="_blank">open script</a>
+              `;
+
+                this.querySelector('select').addEventListener('change', () => {
+
+                    this.querySelector('a').href = 'https://script.google.com/d/' + this.querySelector('select').value + '/edit';
+
+                });
+
+                document.querySelector(`[is="${MainContent.tag}"]`).dispatchEvent(new CustomEvent('ready', {
+                    detail: {
+                        ready: true
+                    }
+                }));
+
+            }
+        }
+        Object.assign(SelectScript.prototype, has_call_backend);
+        customElements.define(SelectScript.tag, SelectScript, {
+            extends: 'div'
+        });
+
+        class ButtonCompile extends HTMLDivElement {
+            static get tag() {
+                return 'button-compile';
+            }
+            connectedCallback() {
+
+                this.innerHTML = `
+                <button>compile</button> 
+                <span></span>
+                `;
+
+                this.querySelector('button').addEventListener('click', async () => {
+
+                    this.setAttribute('disabled', true);
+                    this.querySelector('span').innerHTML = '';
+                    
+                    if( confirm('are you sure? The process is irreversible') ){
+
+                    const array_arguments = [
+                        document.querySelector('#origin-select').value,
+                        document.querySelector('#destination-select').value
+                    ]
+
+                    const result = await this.call_backend('compile', array_arguments);
+                    
+                    const object_result = JSON.parse(result) ;
+                    
+                    const message_result = object_result.error ? 
+                    object_result.error.message
+                    :
+                    'successfully compiled'
+                    ;
+
+                    this.querySelector('span').innerHTML = message_result;
+                    
+                    }
+
+                    this.removeAttribute('disabled');
+
+                });
+
+
+            }
+        }
+        Object.assign(ButtonCompile.prototype, has_call_backend);
+        customElements.define(ButtonCompile.tag, ButtonCompile, {
+            extends: 'div'
+        });
+
+        class MainContent extends HTMLDivElement {
+            static get tag() {
+                return 'main-content';
+            }
+            connectedCallback() {
+
+                this.innerHTML = `
+                  <div is="select-script" id="origin" additional-text="Origin project in ES6"></div>
+                  <div is="select-script" id="destination" additional-text="Destination project in ES5"></div>                  
+              `;
+
+                let counter_ready = 0;
+
+                this.addEventListener('ready', () => {
+
+                    counter_ready++;
+
+                    if (counter_ready === 2) {
+
+                        Array.from(document.querySelectorAll(`[is="${SelectScript.tag}"]`)).forEach(element => element.querySelector('select').removeAttribute('disabled'));
+
+                        this.insertAdjacentHTML('beforeend', `<div is="${ButtonCompile.tag}"></div>`);
+
+                    }
+
+                })
+
+            }
+        }
+        customElements.define(MainContent.tag, MainContent, {
+            extends: 'div'
+        });
+
+    </script>
+</body>
+
+</html>
