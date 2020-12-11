@@ -1,5 +1,7 @@
 // https://github.com/marcomow/babel-apps-script/
 
+const NAME_FILE_POLYFILLS = 'polyfill.min';
+
 const doGet = function () {
   
   return HtmlService.createHtmlOutputFromFile('index')
@@ -65,7 +67,6 @@ const get_project = function (id_script) {
 
 
 
-
 const update_project = function (id_script, object_project) {
   
   const url_base = 'https://script.googleapis.com/v1/projects/' + id_script + '/content';
@@ -127,8 +128,25 @@ const compile = function (id_script_origin, id_script_destination) {
     return object_file;
     
   });
-  
+    
   object_project_origin.files = array_files_destination;
+  
+  const condition_file_named_polyfills = object_project_origin.files.find(a=>a.name===NAME_FILE_POLYFILLS);
+  
+  if(condition_file_named_polyfills){
+  
+    return JSON.stringify({error:{message:'compiling failed. You should NOT have a file named "' + NAME_FILE_POLYFILLS + '" as it is reserved'}}) ;
+    
+  }
+  
+  const object_file_polyfills = {
+    name:NAME_FILE_POLYFILLS,
+    type:'SERVER_JS',
+    source: HtmlService.createHtmlOutputFromFile('polyfill').getContent().replace('<script>','').replace('</script>','')
+  }
+  
+  object_project_origin.files.push(object_file_polyfills);
+  
   
   const result = update_project(id_script_destination, object_project_origin);
   
