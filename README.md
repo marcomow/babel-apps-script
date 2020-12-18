@@ -8,7 +8,7 @@ I suggest using a script in ES6 as origin and the one you want to run in Rhino (
 
 NB! The project is in its infancy and we hope it stays this way, meaning Apps Script development team has solved the issues that prevent some projects from being successfully ported to V8.
 
-At the moment the app is not released to general public, and **you have to contact me personally to add you to the app**.
+At the moment the app is not released to general public, and **you must contact me personally to add you to the app**.
 I'm not planning to release (verify) the webapp as  it is a time consuming process that seems inappropriate for such project, but most of all because I really hope it is just an emergency tool and that soon there won't be the need of it.
 
 
