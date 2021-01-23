@@ -1,0 +1,12 @@
+{
+  "timeZone": "America/New_York",
+  "dependencies": {
+  },
+  "webapp": {
+    "access": "ANYONE",
+    "executeAs": "USER_ACCESSING"
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "oauthScopes": ["https://www.googleapis.com/auth/drive.readonly", "https://www.googleapis.com/auth/script.external_request", "https://www.googleapis.com/auth/script.projects"],
+  "runtimeVersion": "V8"
+}
